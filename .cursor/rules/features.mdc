@@ -1,0 +1,101 @@
+---
+description: Features of the project
+globs: 
+---
+# Game Engine Features
+
+## Core Features
+
+### 1. Scene Management
+
+- Scene graph
+- Scene loading/unloading
+- Scene transitions
+- Dynamic object spawning
+
+### 2. Asset Management
+
+- Model loading
+- Texture loading
+- Audio loading
+- Asset preloading
+- Asset caching
+
+### 3. Physics & Collision
+
+- Collision detection
+- Physics simulation
+- Raycasting
+- Trigger zones
+
+### 4. Input Handling
+
+- Keyboard/Mouse input
+- Gamepad support
+- Touch input
+- Input mapping system
+
+### 5. UI System
+
+- HUD elements
+- Menus
+- Inventory systems
+- Dialog systems
+
+### 6. Animation System
+
+- Skeletal animation
+- Property animation
+- State machine
+- Blend trees
+
+### 7. Particle System
+
+- Particle emitters
+- Particle effects
+- Particle physics
+
+### 8. Debug Tools
+
+- Performance monitoring
+- Debug rendering
+- Scene inspector
+- Component inspector
+
+### 9. Networking
+
+- **Connection Management**
+
+  - WebSocket connection handling
+  - Reconnection strategies
+  - Connection state monitoring
+  - Ping/Latency measurement
+
+- **State Synchronization**
+
+  - Entity replication
+  - Delta compression
+  - Snapshot interpolation
+  - State reconciliation
+
+- **Room Management**
+
+  - Room creation/joining
+  - Player matching
+  - Room state management
+  - Room configuration
+
+- **Multiplayer Features**
+  - Player authentication
+  - Match making
+  - Real-time communication
+  - Leaderboards
+  - Player statistics
+
+### 10. Anti-Cheat Measures
+
+- Server authority validation
+- Client prediction verification
+- Input sanitization
+- Rate limiting
+- Cheat detection

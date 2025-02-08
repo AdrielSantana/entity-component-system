@@ -1,0 +1,79 @@
+---
+description: Architecture of the project
+globs: 
+---
+# Game Engine Architecture
+
+## Core Structure
+
+- **Frontend Framework**: React + Vite
+- **3D Engine**: Three.js
+- **State Management**: ECS (Entity Component System)
+- **Build System**: Vite
+- **Language**: TypeScript
+
+## Core Systems Integration
+
+1. **Renderer System**
+
+   - Three.js scene management
+   - Camera controls
+   - Lighting system
+   - Post-processing pipeline
+
+2. **Physics System**
+
+   - Collision detection
+   - Rigid body dynamics
+   - Ray casting
+
+3. **Input System**
+
+   - Keyboard input
+   - Mouse input
+   - Gamepad support
+
+4. **Audio System**
+
+   - Sound effects
+   - Background music
+   - 3D audio positioning
+
+5. **Resource Management**
+
+   - Asset loading
+   - Memory management
+   - Resource pooling
+
+6. **Network System**
+
+   - WebSocket connection management
+   - State synchronization
+   - Client prediction
+   - Server reconciliation
+   - Lag compensation
+
+7. **Server Architecture**
+   - Express.js REST API
+   - WebSocket server
+   - Room management
+   - Game state authority
+   - Player session handling
+
+## Network Architecture
+
+### Client-Side
+
+- WebSocket client
+- State prediction
+- Input buffer
+- Entity interpolation
+- Snapshot management
+
+### Server-Side
+
+- Game rooms
+- Physics authority
+- State broadcast
+- Input validation
+- Anti-cheat measures

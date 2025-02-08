@@ -1,0 +1,104 @@
+---
+description: Base of the project: Entity Component System
+globs: 
+---
+# Entity Component System (ECS)
+
+## Core Concepts
+
+### Entity
+- Unique identifier
+- Container for components
+- No behavior of its own
+
+### Component
+Pure data structures that contain:
+- Transform data
+- Physics data
+- Rendering data
+- Custom game data
+
+### System
+Logic that operates on entities with specific components:
+- RenderSystem
+- PhysicsSystem
+- InputSystem
+- AISystem
+
+## Implementation Details
+
+### Component Types
+1. **TransformComponent**
+   - Position (Vector3)
+   - Rotation (Quaternion)
+   - Scale (Vector3)
+
+2. **RenderComponent**
+   - Mesh
+   - Material
+   - Visibility
+
+3. **PhysicsComponent**
+   - Velocity
+   - Mass
+   - Collider
+
+4. **InputComponent**
+   - Input mappings
+   - Current state
+   - Previous state
+
+5. **NetworkComponent**
+   - NetworkId
+   - Owner
+   - LastUpdateTimestamp
+   - InterpolationState
+   - AuthorityType (Client/Server)
+
+6. **SyncComponent**
+   - SyncProperties
+   - SyncInterval
+   - PriorityLevel
+   - ReplicationMode (Reliable/Unreliable)
+
+### System Implementation
+```typescript
+interface System {
+    update(deltaTime: number): void;
+    init(): void;
+    cleanup(): void;
+}
+```
+
+### Entity Management
+- Entity creation/destruction
+- Component addition/removal
+- Entity querying
+- Component querying
+
+### Network-Specific Systems
+
+1. **NetworkSyncSystem**
+```typescript
+interface NetworkSyncSystem extends System {
+  interpolate(deltaTime: number): void;
+  reconcile(serverState: any): void;
+  predict(input: any): void;
+}
+```
+
+2. **NetworkStateSystem**
+```typescript
+interface NetworkStateSystem extends System {
+  serialize(): Buffer;
+  deserialize(data: Buffer): void;
+  applySnapshot(snapshot: any): void;
+}
+```
+
+### Entity Replication
+- Server authority model
+- Client prediction
+- State interpolation
+- Delta compression
+- Interest management

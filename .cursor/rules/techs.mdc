@@ -1,0 +1,91 @@
+---
+description: Technologies used in the project
+globs: 
+---
+# Technologies and Dependencies
+
+## Core Technologies
+
+- React 18+
+- Vite 4+
+- Three.js
+- TypeScript 5+
+
+## Essential Dependencies
+
+- @react-three/fiber
+- @react-three/drei
+- @react-three/rapier (physics)
+- zustand (state management)
+- jotai (atomic state management)
+
+## Development Dependencies
+
+- ESLint
+- Prettier
+- Vitest
+- React Testing Library
+- TypeScript
+- @types/three
+
+## Optional Dependencies
+
+- @react-three/postprocessing
+- @react-three/flex
+- three-stdlib
+- leva (debug UI)
+- r3f-perf (performance monitoring)
+
+## Build Tools
+
+- Vite
+- TypeScript Compiler
+- Rollup (via Vite)
+
+## Development Tools
+
+- VS Code Extensions:
+  - ESLint
+  - Prettier
+  - Three.js Snippets
+  - TypeScript and JavaScript Language Features
+
+## Server Technologies
+
+- Node.js
+- Express.js
+- Socket.io / WS
+- MongoDB / PostgreSQL
+- Redis (for session/cache)
+
+## Network Dependencies
+
+- socket.io-client
+- @socket.io/admin-ui
+- buffer
+- msgpack-lite (efficient serialization)
+- node-schedule
+- jsonwebtoken (JWT)
+
+## Server Development Dependencies
+
+- nodemon
+- pm2
+- jest
+- supertest
+- typescript
+- ts-node
+
+## Monitoring & Debug Tools
+
+- Socket.IO Admin UI
+- Prometheus
+- Grafana
+- Winston (logging)
+
+## Security Dependencies
+
+- helmet
+- cors
+- rate-limiter-flexible
+- express-validator

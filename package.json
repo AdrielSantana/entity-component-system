@@ -1,0 +1,30 @@
+{
+  "name": "game-test",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "build": "npm run build:server && npm run build:client",
+    "start:client": "cd client && npm run preview",
+    "start:server": "cd server && npm run start",
+    "start": "concurrently \"npm run start:server\" \"npm run start:client\"",
+    "install:all": "npm install && npm run install:client && npm run install:server",
+    "install:client": "cd client && npm install",
+    "install:server": "cd server && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.0"
+  },
+  "dependencies": {
+    "vite-plugin-top-level-await": "^1.4.4",
+    "vite-plugin-wasm": "^3.4.1"
+  }
+}
