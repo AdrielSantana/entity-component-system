@@ -22,7 +22,7 @@ export class ClientPhysicsSystem {
   private gravity = { x: 0, y: -9.81, z: 0 };
   private initialized: boolean = false;
   private readonly POSITION_CORRECTION_THRESHOLD = 0.5;
-  private readonly VELOCITY_CORRECTION_THRESHOLD = 1.5;
+  private readonly VELOCITY_CORRECTION_THRESHOLD = 3;
   private readonly CORRECTION_ALPHA = 0.25;
   private readonly MAX_PREDICTION_ERROR = 10;
 
