@@ -4,7 +4,7 @@ import helmet from "helmet";
 import { GameServer } from "./network/WebSocketServer";
 
 const app = express();
-const wsPort = process.env.WS_PORT ? parseInt(process.env.WS_PORT) : 3001;
+const wsPort = process.env.WS_PORT ? parseInt(process.env.WS_PORT) : 8888;
 
 // Middleware
 app.use(cors());

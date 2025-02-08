@@ -6,14 +6,14 @@ import topLevelAwait from "vite-plugin-top-level-await";
 export default defineConfig({
   plugins: [react(), wasm(), topLevelAwait()],
   server: {
-    port: 3000,
+    port: 9999,
     proxy: {
       "/api": {
-        target: "http://localhost:3001",
+        target: "http://localhost:8888",
         changeOrigin: true,
       },
       "/ws": {
-        target: "ws://localhost:3001",
+        target: "ws://localhost:8888",
         ws: true,
       },
     },
