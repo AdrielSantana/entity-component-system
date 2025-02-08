@@ -108,7 +108,7 @@ export class ClientGameLoop {
 
     // Initialize network manager
     this.networkManager = new NetworkManager({
-      serverUrl: "ws://localhost:3001",
+      serverUrl: import.meta.env.VITE_SERVER_SOCKET_URL,
       reconnectInterval: 1000,
       maxReconnectAttempts: 5,
     });
