@@ -16,7 +16,7 @@ export interface GameEntity {
 }
 
 export class ClientGameLoop {
-  private readonly FPS: number = 30;
+  private readonly FPS: number = 60;
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
   private renderer: THREE.WebGLRenderer;

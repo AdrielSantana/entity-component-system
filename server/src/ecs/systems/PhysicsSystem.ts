@@ -251,4 +251,33 @@ export class PhysicsSystem extends System {
       this.world.free();
     }
   }
+
+  public setPosition(
+    entity: Entity,
+    position: { x: number; y: number; z: number }
+  ): void {
+    const transform =
+      entity.getComponent<TransformComponent>("TransformComponent");
+    const physics = entity.getComponent<PhysicsComponent>("PhysicsComponent");
+    const physicsObject = this.physicsObjects.get(entity);
+
+    if (transform && physics && physicsObject) {
+      // Update transform component
+      transform.position = { ...position };
+
+      // Reset physics state
+      physics.velocity = { x: 0, y: 0, z: 0 };
+      physics.acceleration = { x: 0, y: 0, z: 0 };
+
+      // Update RAPIER rigid body position
+      physicsObject.rigidBody.setTranslation(
+        new RAPIER.Vector3(position.x, position.y, position.z),
+        true // Wake up the body
+      );
+
+      // Reset velocities in physics engine
+      physicsObject.rigidBody.setLinvel(new RAPIER.Vector3(0, 0, 0), true);
+      physicsObject.rigidBody.setAngvel(new RAPIER.Vector3(0, 0, 0), true);
+    }
+  }
 }

@@ -28,8 +28,10 @@ export class GameLoop {
   private networkSystem: NetworkSyncSystem = new NetworkSyncSystem();
   private physicsSystem: PhysicsSystem = new PhysicsSystem(this.debugSystem);
   private updateSystem: UpdateSystem = new UpdateSystem();
-  private readonly FPS = 30;
+  private readonly FPS = 60;
   private readonly MAX_FRAME_TIME = 0.25; // Maximum allowed frame time to prevent spiral of death
+  private spawnPositions: Map<string, { x: number; y: number; z: number }> =
+    new Map();
 
   // Performance monitoring
   private metrics: PerformanceMetrics = {
@@ -122,6 +124,10 @@ export class GameLoop {
       const y = 5 + Math.random() * 10;
       const z = -8 + Math.random() * 16;
 
+      // Store spawn position
+      const networkId = `dynamic-cube-${i}`;
+      this.spawnPositions.set(networkId, { x, y, z });
+
       cube.addComponent(
         new TransformComponent(
           { x, y, z },
@@ -151,7 +157,7 @@ export class GameLoop {
       );
       cube.addComponent(
         new NetworkComponent(
-          `dynamic-cube-${i}`,
+          networkId,
           "server",
           Date.now(),
           null,
@@ -258,10 +264,34 @@ export class GameLoop {
 
     // Fixed timestep updates for physics
     const physicsStart = this.getCurrentTime();
-
     this.updateSystem.update(frameTime); // Update entities before physics
     this.physicsSystem.update(frameTime);
     this.metrics.physicsTime = this.getCurrentTime() - physicsStart;
+
+    // Check for entities that need respawning AFTER physics update
+    this.world.getAllEntities().forEach((entity) => {
+      const transform =
+        entity.getComponent<TransformComponent>("TransformComponent");
+      const network = entity.getComponent<NetworkComponent>("NetworkComponent");
+      const physics = entity.getComponent<PhysicsComponent>("PhysicsComponent");
+
+      if (transform && network && physics) {
+        // Check if entity has fallen below -100
+        const spawnPos = this.spawnPositions.get(network.networkId);
+        if (transform.position.y < -100) {
+          // Get spawn position
+          if (spawnPos) {
+            // Update physics system with new position first
+            this.physicsSystem.setPosition(entity, spawnPos);
+
+            // Then update component states to match
+            transform.position = { ...spawnPos };
+            physics.velocity = { x: 0, y: 0, z: 0 };
+            physics.acceleration = { x: 0, y: 0, z: 0 };
+          }
+        }
+      }
+    });
 
     // Variable timestep updates for other systems
     const networkStart = this.getCurrentTime();
@@ -285,11 +315,15 @@ export class GameLoop {
 
   public createPlayerEntity(playerId: string): Entity {
     const player = this.world.createEntity();
+    const spawnPosition = { x: 0, y: 5, z: 0 }; // Default spawn position
+
+    // Store spawn position
+    this.spawnPositions.set(`player-${playerId}`, { ...spawnPosition });
 
     // Add transform component for position/rotation
     player.addComponent(
       new TransformComponent(
-        { x: 0, y: 5, z: 0 }, // Start position
+        spawnPosition,
         { x: 0, y: 0, z: 0, w: 1 }, // No rotation
         { x: 1, y: 1, z: 1 } // Normal scale
       )
