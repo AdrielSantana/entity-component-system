@@ -1,17 +1,17 @@
 # 3D Multiplayer Game with Entity Component System
 
-A real-time multiplayer 3D game built with TypeScript, React, Three.js, and WebSocket, using an Entity Component System architecture.
+A real-time multiplayer 3D game built with TypeScript, React, Three.js, and Geckos.io (UDP over WebRTC), using an Entity Component System architecture.
 
 ## Features
 
 - Entity Component System (ECS) architecture
-- Real-time multiplayer synchronization
+- Real-time multiplayer synchronization with UDP over WebRTC
 - Client-side prediction and reconciliation
-- State interpolation
+- Advanced snapshot interpolation with Geckos.io
 - Physics simulation
 - 3D rendering with Three.js
-- WebSocket communication
-- Performance monitoring
+- High-performance UDP communication via Geckos.io
+- Performance monitoring and network quality tracking
 
 ## Project Structure
 
@@ -82,6 +82,21 @@ Start both client and server:
 npm run start
 ```
 
+### Network Configuration
+
+The game uses Geckos.io for UDP over WebRTC communication. By default:
+
+- **Signaling Port**: 9208/TCP (for WebRTC peer signaling)
+- **Data Port Range**: 1025-65535/UDP (for WebRTC data channels)
+
+For production deployment, ensure your server/firewall allows:
+- Port 9208/TCP for signaling traffic
+- UDP port range 1025-65535 for WebRTC data channels
+
+### ICE Servers
+
+The game includes default STUN servers for development. For production, consider setting up your own TURN servers for better connectivity across restrictive networks. Configure them in `geckos.config.ts`.
+
 ## Architecture
 
 ### Entity Component System (ECS)
@@ -94,11 +109,14 @@ The game uses an ECS architecture where:
 
 ### Network Architecture
 
-- WebSocket server for real-time communication
+- Geckos.io server for real-time UDP over WebRTC communication
+- High-performance unordered/unreliable messaging for frequent updates
+- Reliable messaging for critical game events
 - Client-side prediction for responsive input
 - Server reconciliation to correct prediction errors
-- State interpolation for smooth movement
+- Advanced snapshot interpolation for smooth movement
 - Authority system to prevent cheating
+- Automatic connection quality monitoring and adaptation
 
 ### Game Loop
 

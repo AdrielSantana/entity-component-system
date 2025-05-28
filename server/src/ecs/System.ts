@@ -1,4 +1,4 @@
-import { Entity } from "./Entity";
+import { Entity } from "./Entity.js";
 
 export interface ISystem {
   update(deltaTime: number): void;

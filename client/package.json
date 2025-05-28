@@ -6,6 +6,8 @@
     "@dimforge/rapier3d-compat": "^0.14.0",
     "@enable3d/ammo-on-nodejs": "^0.25.4",
     "@enable3d/ammo-physics": "^0.25.4",
+    "@geckos.io/client": "^3.0.2",
+    "@geckos.io/typed-array-buffer-schema": "^1.2.1",
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",

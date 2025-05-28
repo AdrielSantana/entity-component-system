@@ -1,5 +1,5 @@
-import { Entity } from "./Entity";
-import { System } from "./System";
+import { Entity } from "./Entity.js";
+import { System } from "./System.js";
 
 export class World {
   private entities: Map<string, Entity>;

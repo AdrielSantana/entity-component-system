@@ -1,8 +1,8 @@
-import { System } from "../System";
-import { Entity } from "../Entity";
-import { PhysicsComponent } from "../components/PhysicsComponent";
-import { TransformComponent } from "../components/TransformComponent";
-import { RenderComponent } from "../components/RenderComponent";
+import { System } from "../System.js";
+import { Entity } from "../Entity.js";
+import { PhysicsComponent } from "../components/PhysicsComponent.js";
+import { TransformComponent } from "../components/TransformComponent.js";
+import { RenderComponent } from "../components/RenderComponent.js";
 
 interface EntityDebugState {
   entityId: string;

@@ -24,6 +24,7 @@
     "concurrently": "^8.0.0"
   },
   "dependencies": {
+    "@geckos.io/typed-array-buffer-schema": "^1.2.1",
     "vite-plugin-top-level-await": "^1.4.4",
     "vite-plugin-wasm": "^3.4.1"
   }

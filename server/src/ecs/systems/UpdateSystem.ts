@@ -1,5 +1,5 @@
-import { System } from "../System";
-import { Entity } from "../Entity";
+import { System } from "../System.js";
+import { Entity } from "../Entity.js";
 
 export class UpdateSystem extends System {
   public shouldProcessEntity(entity: Entity): boolean {

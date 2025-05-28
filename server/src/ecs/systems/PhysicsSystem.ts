@@ -1,12 +1,12 @@
-import { System } from "../System";
-import { Entity } from "../Entity";
-import { PhysicsComponent } from "../components/PhysicsComponent";
-import { TransformComponent } from "../components/TransformComponent";
-import { DebugSystem } from "./DebugSystem";
+import { System } from "../System.js";
+import { Entity } from "../Entity.js";
+import { PhysicsComponent } from "../components/PhysicsComponent.js";
+import { TransformComponent } from "../components/TransformComponent.js";
+import { DebugSystem } from "./DebugSystem.js";
 import {
   NetworkComponent,
   AuthorityType,
-} from "../components/NetworkComponent";
+} from "../components/NetworkComponent.js";
 import * as RAPIER from "@dimforge/rapier3d-compat";
 
 interface PhysicsObject {
@@ -208,11 +208,30 @@ export class PhysicsSystem extends System {
     const physicsObject = this.physicsObjects.get(entity);
     if (!physicsObject || physicsObject.isStatic) return;
 
+    const currentVel = physicsObject.rigidBody.linvel();
     physicsObject.rigidBody.setLinvel(
       new RAPIER.Vector3(
-        velocity.x || physicsObject.rigidBody.linvel().x,
-        velocity.y || physicsObject.rigidBody.linvel().y,
-        velocity.z || physicsObject.rigidBody.linvel().z
+        velocity.x !== undefined ? velocity.x : currentVel.x,
+        velocity.y !== undefined ? velocity.y : currentVel.y,
+        velocity.z !== undefined ? velocity.z : currentVel.z
+      ),
+      true
+    );
+  }
+
+  public setAngularVelocity(
+    entity: Entity,
+    angularVelocity: { x?: number; y?: number; z?: number }
+  ): void {
+    const physicsObject = this.physicsObjects.get(entity);
+    if (!physicsObject || physicsObject.isStatic) return;
+
+    const currentAngVel = physicsObject.rigidBody.angvel();
+    physicsObject.rigidBody.setAngvel(
+      new RAPIER.Vector3(
+        angularVelocity.x !== undefined ? angularVelocity.x : currentAngVel.x,
+        angularVelocity.y !== undefined ? angularVelocity.y : currentAngVel.y,
+        angularVelocity.z !== undefined ? angularVelocity.z : currentAngVel.z
       ),
       true
     );

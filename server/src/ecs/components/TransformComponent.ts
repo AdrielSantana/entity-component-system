@@ -1,4 +1,4 @@
-import { Component } from "../Component";
+import { Component } from "../Component.js";
 
 export interface Vector3 {
   x: number;

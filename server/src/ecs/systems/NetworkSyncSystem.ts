@@ -1,11 +1,11 @@
-import { System } from "../System";
-import { Entity } from "../Entity";
+import { System } from "../System.js";
+import { Entity } from "../Entity.js";
 import {
   NetworkComponent,
   AuthorityType,
-} from "../components/NetworkComponent";
-import { TransformComponent } from "../components/TransformComponent";
-import { PhysicsComponent } from "../components/PhysicsComponent";
+} from "../components/NetworkComponent.js";
+import { TransformComponent } from "../components/TransformComponent.js";
+import { PhysicsComponent } from "../components/PhysicsComponent.js";
 
 export interface NetworkState {
   networkId: string;

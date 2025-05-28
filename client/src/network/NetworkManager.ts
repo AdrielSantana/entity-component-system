@@ -15,13 +15,13 @@ export interface ClientInput {
 export class NetworkManager {
   private ws: WebSocket | null = null;
   private config: NetworkConfig;
-  private reconnectAttempts: number = 0;
-  private inputSequence: number = 0;
-  private lastProcessedInput: number = 0;
+  private reconnectAttempts = 0;
+  private inputSequence = 0;
+  private lastProcessedInput = 0;
   private eventListeners: Map<string, Set<EventCallback>> = new Map();
-  private isConnecting: boolean = false;
+  private isConnecting = false;
   private reconnectTimeout: NodeJS.Timeout | null = null;
-  private shouldReconnect: boolean = true;
+  private shouldReconnect = true;
   private connectionAttemptTimeout: NodeJS.Timeout | null = null;
 
   constructor(config: NetworkConfig) {
@@ -34,6 +34,13 @@ export class NetworkManager {
       this.eventListeners.set(event, new Set());
     }
     this.eventListeners.get(event)?.add(callback);
+  }
+
+  public onRaw(callback: EventCallback): void {
+    if (!this.eventListeners.has('gameState')) {
+      this.eventListeners.set('gameState', new Set());
+    }
+    this.eventListeners.get('gameState')?.add(callback);
   }
 
   public off(event: string, callback: EventCallback): void {
@@ -244,6 +251,33 @@ export class NetworkManager {
 
   public isConnected(): boolean {
     return this.ws !== null && this.ws.readyState === WebSocket.OPEN;
+  }
+
+  public getConnectionStats(): any {
+    return {
+      connected: this.isConnected(),
+      clientId: null, // WebSocket doesn't have client ID
+      latency: 0, // WebSocket doesn't track latency
+      reconnectAttempts: this.reconnectAttempts,
+      inputSequence: this.inputSequence,
+      lastProcessedInput: this.lastProcessedInput,
+      quality: {
+        latency: 0,
+        jitter: 0,
+        packetLoss: 0,
+        connectionStrength: 'good' as const
+      },
+      stats: {
+        bytesSent: 0,
+        bytesReceived: 0,
+        messagesSent: 0,
+        messagesReceived: 0,
+        avgLatency: 0,
+        maxLatency: 0,
+        minLatency: 0,
+        connectionUptime: 0
+      }
+    };
   }
 
   public disconnect(): void {

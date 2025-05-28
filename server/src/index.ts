@@ -1,34 +1,35 @@
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-import { GameServer } from "./network/WebSocketServer";
+import { GeckosGameServer } from './network/GeckosServer.js';
 
-const app = express();
-const wsPort = process.env.WS_PORT ? parseInt(process.env.WS_PORT) : 8888;
+const geckosPort = process.env.GECKOS_PORT ? parseInt(process.env.GECKOS_PORT) : 9208;
 
-// Middleware
-app.use(cors());
-app.use(helmet());
-app.use(express.json());
+console.log('🚀 Starting Entity Component System Game Server');
+console.log(`📡 Geckos.io (UDP over WebRTC) port: ${geckosPort}`);
 
-// HTTP routes
-app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
-});
+// Create and start the Geckos.io game server
+const gameServer = new GeckosGameServer();
+gameServer.start(); // Server listens automatically in constructor
 
-// Start WebSocket game server
-const gameServer = new GameServer(wsPort);
-console.log(`WebSocket game server listening on port ${wsPort}`);
+console.log('✅ Game server started successfully');
 
-// Handle graceful shutdown
-process.on("SIGTERM", () => {
-  console.log("SIGTERM signal received: closing servers");
-  gameServer.cleanup();
+// Set up health endpoint stats
+setInterval(() => {
+  const stats = gameServer.getStats();
+  if (stats.connectedClients > 0) {
+    console.log(`📊 Server Status: ${stats.connectedClients} clients connected, ${stats.messagesSent} msgs sent, ${stats.messagesReceived} msgs received`);
+  }
+}, 30000); // Log every 30 seconds
+
+// Graceful shutdown handling
+process.on('SIGINT', () => {
+  console.log('\n🛑 Received SIGINT, shutting down gracefully...');
+  gameServer.stop();
   process.exit(0);
 });
 
-process.on("SIGINT", () => {
-  console.log("SIGINT signal received: closing servers");
-  gameServer.cleanup();
+process.on('SIGTERM', () => {
+  console.log('\n🛑 Received SIGTERM, shutting down gracefully...');
+  gameServer.stop();
   process.exit(0);
 });
+
+console.log('🎮 Game server is ready for connections!');

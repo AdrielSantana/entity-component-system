@@ -1,16 +1,16 @@
-import { World } from "../ecs/World";
-import { NetworkSyncSystem } from "../ecs/systems/NetworkSyncSystem";
-import { PhysicsSystem } from "../ecs/systems/PhysicsSystem";
-import { DebugSystem } from "../ecs/systems/DebugSystem";
-import { UpdateSystem } from "../ecs/systems/UpdateSystem";
-import { Entity } from "../ecs/Entity";
-import { TransformComponent } from "../ecs/components/TransformComponent";
+import { World } from "../ecs/World.js";
+import { NetworkSyncSystem } from "../ecs/systems/NetworkSyncSystem.js";
+import { PhysicsSystem } from "../ecs/systems/PhysicsSystem.js";
+import { DebugSystem } from "../ecs/systems/DebugSystem.js";
+import { UpdateSystem } from "../ecs/systems/UpdateSystem.js";
+import { Entity } from "../ecs/Entity.js";
+import { TransformComponent } from "../ecs/components/TransformComponent.js";
 import {
   NetworkComponent,
   AuthorityType,
-} from "../ecs/components/NetworkComponent";
-import { RenderComponent } from "../ecs/components/RenderComponent";
-import { PhysicsComponent } from "../ecs/components/PhysicsComponent";
+} from "../ecs/components/NetworkComponent.js";
+import { RenderComponent } from "../ecs/components/RenderComponent.js";
+import { PhysicsComponent } from "../ecs/components/PhysicsComponent.js";
 
 interface PerformanceMetrics {
   frameTime: number;
@@ -374,15 +374,20 @@ export class GameLoop {
 
   public handleClientInput(
     networkId: string,
-    input: { velocity: { x: number; z: number }; jump?: boolean }
+    input: { velocity: { x: number; z: number }; rotation?: number; jump?: boolean }
   ) {
+    if (Math.random() < 0.01) {
+      console.log(`Handling input for client ${networkId}:`, input);
+    }
+
     let entity = this.world.getAllEntities().find((e) => {
       const network = e.getComponent<NetworkComponent>("NetworkComponent");
       return network && network.networkId === `player-${networkId}`;
     });
 
     // Create player entity if it doesn't exist
-    if (!entity && networkId.startsWith("player-")) {
+    if (!entity) {
+      console.log(`Creating player entity for client: ${networkId}`);
       entity = this.createPlayerEntity(networkId);
     }
 
@@ -395,6 +400,7 @@ export class GameLoop {
       if (network && physics && transform) {
         const MOVE_SPEED = 5;
         const JUMP_FORCE = 1;
+        const ROTATION_SPEED = 3; // Rotation speed in radians per second
         const MAX_VELOCITY = 10;
 
         // Apply input forces/velocities
@@ -416,6 +422,13 @@ export class GameLoop {
           x: input.velocity.x * MOVE_SPEED,
           z: input.velocity.z * MOVE_SPEED,
         });
+
+        // Handle rotation
+        if (input.rotation !== undefined) {
+          this.physicsSystem.setAngularVelocity(entity, {
+            y: input.rotation * ROTATION_SPEED,
+          });
+        }
 
         // Use proper physics ground check
         const isGrounded = this.physicsSystem.isGrounded(entity);

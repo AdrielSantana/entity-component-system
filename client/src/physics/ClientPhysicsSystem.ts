@@ -9,22 +9,13 @@ export interface PhysicsObject {
   isStatic: boolean;
   entity: GameEntity;
   isClientAuthoritative: boolean;
-  lastServerState?: {
-    position: THREE.Vector3;
-    rotation: THREE.Quaternion;
-    velocity: THREE.Vector3;
-  };
 }
 
 export class ClientPhysicsSystem {
   private world!: RAPIER.World;
   private physicsObjects: Map<string, PhysicsObject> = new Map();
   private gravity = { x: 0, y: -9.81, z: 0 };
-  private initialized: boolean = false;
-  private readonly POSITION_CORRECTION_THRESHOLD = 0.5;
-  private readonly VELOCITY_CORRECTION_THRESHOLD = 3;
-  private readonly CORRECTION_ALPHA = 0.25;
-  private readonly MAX_PREDICTION_ERROR = 10;
+  private initialized = false;
 
   constructor() {
     this.initPhysics();
@@ -49,9 +40,9 @@ export class ClientPhysicsSystem {
 
   public addEntity(
     entity: GameEntity,
-    isStatic: boolean = false,
-    useGravity: boolean = true,
-    isClientAuthoritative: boolean = false
+    isStatic = false,
+    useGravity = true,
+    isClientAuthoritative = false
   ) {
     if (!this.initialized) return;
 
@@ -83,11 +74,6 @@ export class ClientPhysicsSystem {
       isStatic,
       entity,
       isClientAuthoritative,
-      lastServerState: {
-        position: mesh.position.clone(),
-        rotation: mesh.quaternion.clone(),
-        velocity: new THREE.Vector3(),
-      },
     };
 
     this.physicsObjects.set(entity.id, physicsObject);
@@ -103,10 +89,13 @@ export class ClientPhysicsSystem {
     return RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2);
   }
 
-  public update() {
+  public update(deltaTime?: number) {
     if (!this.initialized) return;
 
-    // Step the physics world
+    // Step the physics world with consistent timestep like the server
+    if (deltaTime !== undefined) {
+      this.world.timestep = deltaTime;
+    }
     this.world.step();
 
     // Update mesh positions based on physics
@@ -118,10 +107,6 @@ export class ClientPhysicsSystem {
         // Update mesh
         obj.mesh.position.set(position.x, position.y, position.z);
         obj.mesh.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w);
-
-        // Update entity interpolation targets
-        obj.entity.interpolation.position.copy(obj.mesh.position);
-        obj.entity.interpolation.rotation.copy(obj.mesh.quaternion);
       }
     });
   }
@@ -151,6 +136,23 @@ export class ClientPhysicsSystem {
         velocity.x || physicsObject.rigidBody.linvel().x,
         velocity.y || physicsObject.rigidBody.linvel().y,
         velocity.z || physicsObject.rigidBody.linvel().z
+      ),
+      true
+    );
+  }
+
+  public setAngularVelocity(
+    entityId: string,
+    angularVelocity: { x?: number; y?: number; z?: number }
+  ) {
+    const physicsObject = this.physicsObjects.get(entityId);
+    if (!physicsObject || physicsObject.isStatic) return;
+
+    physicsObject.rigidBody.setAngvel(
+      new RAPIER.Vector3(
+        angularVelocity.x || physicsObject.rigidBody.angvel().x,
+        angularVelocity.y || physicsObject.rigidBody.angvel().y,
+        angularVelocity.z || physicsObject.rigidBody.angvel().z
       ),
       true
     );
@@ -223,92 +225,16 @@ export class ClientPhysicsSystem {
       state.physics?.velocity?.z || 0
     );
 
-    if (physicsObject.isStatic) {
-      physicsObject.rigidBody.setTranslation(serverPosition, true);
-      physicsObject.rigidBody.setRotation(serverRotation, true);
-      physicsObject.rigidBody.setLinvel(
-        new RAPIER.Vector3(
-          serverVelocity.x,
-          serverVelocity.y,
-          serverVelocity.z
-        ),
-        true
-      );
-    } else {
-      const lastValidatedState =
-        state.lastValidatedState || physicsObject.lastServerState;
-      if (lastValidatedState) {
-        physicsObject.lastServerState = {
-          position: serverPosition,
-          rotation: serverRotation,
-          velocity: serverVelocity,
-        };
-
-        // Check prediction error
-        const currentPosition = physicsObject.rigidBody.translation();
-        const predictionError = new THREE.Vector3(
-          serverPosition.x - currentPosition.x,
-          serverPosition.y - currentPosition.y,
-          serverPosition.z - currentPosition.z
-        ).length();
-
-        if (predictionError > this.MAX_PREDICTION_ERROR) {
-          // Hard correction for large errors
-          physicsObject.rigidBody.setTranslation(serverPosition, true);
-          physicsObject.rigidBody.setLinvel(
-            new RAPIER.Vector3(
-              serverVelocity.x,
-              serverVelocity.y,
-              serverVelocity.z
-            ),
-            true
-          );
-        } else {
-          // Smooth correction for small errors
-          this.reconcileClientState(physicsObject);
-        }
-      }
-    }
-  }
-
-  private reconcileClientState(physicsObject: PhysicsObject) {
-    if (!physicsObject.lastServerState) return;
-
-    const currentPosition = physicsObject.rigidBody.translation();
-    const currentVelocity = physicsObject.rigidBody.linvel();
-    const serverPosition = physicsObject.lastServerState.position;
-    const serverVelocity = physicsObject.lastServerState.velocity;
-
-    // Calculate differences
-    const positionDiff = new THREE.Vector3(
-      serverPosition.x - currentPosition.x,
-      serverPosition.y - currentPosition.y,
-      serverPosition.z - currentPosition.z
+    // Apply server state directly (no interpolation or prediction)
+    physicsObject.rigidBody.setTranslation(serverPosition, true);
+    physicsObject.rigidBody.setRotation(serverRotation, true);
+    physicsObject.rigidBody.setLinvel(
+      new RAPIER.Vector3(
+        serverVelocity.x,
+        serverVelocity.y,
+        serverVelocity.z
+      ),
+      true
     );
-    const velocityDiff = new THREE.Vector3(
-      serverVelocity.x - currentVelocity.x,
-      serverVelocity.y - currentVelocity.y,
-      serverVelocity.z - currentVelocity.z
-    );
-
-    // Apply smooth correction if needed
-    if (
-      positionDiff.length() > this.POSITION_CORRECTION_THRESHOLD ||
-      velocityDiff.length() > this.VELOCITY_CORRECTION_THRESHOLD
-    ) {
-      const newPosition = new RAPIER.Vector3(
-        currentPosition.x + positionDiff.x * this.CORRECTION_ALPHA,
-        currentPosition.y + positionDiff.y * this.CORRECTION_ALPHA,
-        currentPosition.z + positionDiff.z * this.CORRECTION_ALPHA
-      );
-      const newVelocity = new RAPIER.Vector3(
-        currentVelocity.x + velocityDiff.x * this.CORRECTION_ALPHA,
-        currentVelocity.y + velocityDiff.y * this.CORRECTION_ALPHA,
-        currentVelocity.z + velocityDiff.z * this.CORRECTION_ALPHA
-      );
-
-      physicsObject.rigidBody.setTranslation(newPosition, true);
-      physicsObject.rigidBody.setLinvel(newVelocity, true);
-    }
   }
 }

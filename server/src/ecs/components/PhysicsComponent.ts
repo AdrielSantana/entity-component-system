@@ -1,5 +1,5 @@
-import { Component } from "../Component";
-import { Vector3 } from "./TransformComponent";
+import { Component } from "../Component.js";
+import { Vector3 } from "./TransformComponent.js";
 
 export interface Collider {
   type: "box" | "sphere" | "capsule";
